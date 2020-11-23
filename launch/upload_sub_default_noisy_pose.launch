@@ -9,14 +9,14 @@
   <arg name="yaw" default="0.0"/>
 
   <arg name="mode" default="default"/>
-  <arg name="namespace" default="rexrov"/>
+  <arg name="namespace" default="sub"/>
   <arg name="pose_noise" default="0.02"/>
   <arg name="world_frame" default="world"/> <!-- This should actually be "/world". See https://github.com/ros-simulation/gazebo_ros_pkgs/pull/324 -->
 
-  <arg name="generated_urdf" default="$(find-pkg-share uuv_descriptions)/robots/generated/$(var namespace)/robot_description"/>
+  <arg name="generated_urdf" default="$(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)/robot_description"/>
   
-  <arg name="cmd" default="xacro '$(find-pkg-share uuv_descriptions)/robots/rexrov_default_noisy_pose.xacro.xacro' 
-          > $(find-pkg-share uuv_descriptions)/robots/generated/$(var namespace)/robot_description
+  <arg name="cmd" default="xacro '$(find-pkg-share sub_descriptions)/robots/$(var namespace)_default_noisy_pose.xacro.xacro' 
+          > $(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)/robot_description
           debug:=$(var debug)
           namespace:=$(var namespace)
           noise_amp:=$(var pose_noise)
