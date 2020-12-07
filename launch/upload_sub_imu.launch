@@ -3,22 +3,24 @@
 
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
-  <arg name="z" default="-20"/>
+  <arg name="z" default="-10"/>
   <arg name="roll" default="0.0"/>
   <arg name="pitch" default="0.0"/>
   <arg name="yaw" default="0.0"/>
 
   <arg name="namespace" default="sub"/>
   <arg name="use_ned_frame" default="false"/>
-  <arg name="generated_urdf" default="$(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)/robot_description"/>
-  <arg name="cmd" default= "$(exec-in-pkg xacro xacro) '$(find-pkg-share sub_descriptions)/robots/$(var namespace)_imu.xacro' 
-          > $(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)/robot_description
+  <arg name="generated_dir" default="$(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)"/>
+  <arg name="generated_urdf" default="$(var generated_dir)/robot_description.urdf" />
+
+  <arg name="cmd" default= "mkdir -p $(var generated_dir) &amp;&amp; $(exec-in-pkg xacro xacro) '$(find-pkg-share sub_descriptions)/robots/$(var namespace)_imu.xacro' 
+          > $(var generated_urdf)
           --inorder
           debug:=$(var debug)
           namespace:=$(var namespace)
           inertial_reference_frame:=world_ned"/>
-  <arg name="cmdUnless" default="xacro '$(find-pkg-share sub_descriptions)/robots/$(var namespace)_imu.xacro' 
-          > $(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)/robot_description
+  <arg name="cmdUnless" default="mkdir -p $(var generated_dir) &amp;&amp; $(exec-in-pkg xacro xacro) $(find-pkg-share sub_descriptions)/robots/$(var namespace)_imu.xacro
+          > $(var generated_urdf)
           debug:=$(var debug)
           namespace:=$(var namespace)
           inertial_reference_frame:=world"/>
@@ -57,8 +59,8 @@
     <node node-name="robot_state_publisher" pkg="robot_state_publisher" exec="robot_state_publisher" respawn="true" output="screen"
       args="$(var generated_urdf)">
       <param name="use_sim_time" value="$(var use_sim_time)"/>
-      <!-- <param name="robot_description" value="/$(var namespace)/robot_description" />
-      <param name="publish_frequency" value="5" /> -->
+      <param name="robot_description" value="/$(var namespace)/robot_description" />
+      <!-- <param name="publish_frequency" value="5" /> -->
     </node>
   </group>
 
