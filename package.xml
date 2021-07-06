@@ -30,6 +30,7 @@
   <test_depend>xacro</test_depend> 
 
   <export>
+    <gazebo_ros gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/robots" />
     <build_type>ament_cmake</build_type>
   </export>
 </package>

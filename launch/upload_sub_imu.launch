@@ -3,30 +3,31 @@
 
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
-  <arg name="z" default="-20"/>
+  <arg name="z" default="-10"/>
   <arg name="roll" default="0.0"/>
   <arg name="pitch" default="0.0"/>
   <arg name="yaw" default="0.0"/>
 
-  <arg name="mode" default="default"/>
-  <arg name="namespace" default="rexrov"/>
+  <arg name="namespace" default="sub"/>
   <arg name="use_ned_frame" default="false"/>
-  <arg name="generated_urdf" default="$(find-pkg-share uuv_descriptions)/robots/generated/$(var namespace)/robot_description"/>
-  <arg name="cmd" default= "$(exec-in-pkg xacro xacro) '$(find-pkg-share uuv_descriptions)/robots/rexrov_$(var mode).xacro' 
-          > $(find-pkg-share uuv_descriptions)/robots/generated/$(var namespace)/robot_description
+  <arg name="generated_dir" default="$(find-pkg-share sub_descriptions)/robots/generated/$(var namespace)"/>
+  <arg name="generated_urdf" default="$(var generated_dir)/robot_description.urdf" />
+
+  <arg name="cmd" default= "mkdir -p $(var generated_dir) &amp;&amp; $(exec-in-pkg xacro xacro) '$(find-pkg-share sub_descriptions)/robots/$(var namespace)_imu.xacro' 
+          > $(var generated_urdf)
           --inorder
           debug:=$(var debug)
           namespace:=$(var namespace)
           inertial_reference_frame:=world_ned"/>
-  <arg name="cmdUnless" default="xacro '$(find-pkg-share uuv_descriptions)/robots/rexrov_$(var mode).xacro' 
-          > $(find-pkg-share uuv_descriptions)/robots/generated/$(var namespace)/robot_description
+  <arg name="cmdUnless" default="mkdir -p $(var generated_dir) &amp;&amp; $(exec-in-pkg xacro xacro) $(find-pkg-share sub_descriptions)/robots/$(var namespace)_imu.xacro
+          > $(var generated_urdf)
           debug:=$(var debug)
           namespace:=$(var namespace)
           inertial_reference_frame:=world"/>
   
   <arg name="use_sim_time" default="true"/>
   
-
+  
   <group>
     <push-ros-namespace namespace="$(var namespace)"/>
     <group if="$(var use_ned_frame)">
@@ -48,10 +49,7 @@
       </executable>
     </group>
 
-    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-    <!-- <node node-name="urdf_spawner" pkg="uuv_descriptions" exec="spawn_model" respawn="false" output="screen"
-          args="-urdf -x $(var x) -y $(var y) -z $(var z) -R $(var roll) -P $(var pitch) -Y $(var yaw) -model $(var namespace) -file /home/jp/ros2_ws/install/uuv_descriptions/share/uuv_descriptions/robots/generated/rexrov/robot_description"/> -->
-    
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->    
     <node node-name="urdf_spawner" pkg="gazebo_ros" exec="spawn_entity.py" respawn="false" output="screen"
           args="-gazebo_namespace /gazebo -x $(var x) -y $(var y) -z $(var z) -R $(var roll) -P $(var pitch) -Y $(var yaw) -entity $(var namespace) -file $(var generated_urdf)"/>
 
@@ -61,8 +59,8 @@
     <node node-name="robot_state_publisher" pkg="robot_state_publisher" exec="robot_state_publisher" respawn="true" output="screen"
       args="$(var generated_urdf)">
       <param name="use_sim_time" value="$(var use_sim_time)"/>
-      <!-- <param name="robot_description" value="/$(var namespace)/robot_description" />
-      <param name="publish_frequency" value="5" /> -->
+      <param name="robot_description" value="/$(var namespace)/robot_description" />
+      <!-- <param name="publish_frequency" value="5" /> -->
     </node>
   </group>
 
